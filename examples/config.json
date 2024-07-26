@@ -1,0 +1,30 @@
+{
+    "allowModelToBeSavedOnServer": true,
+    "sbmlValidation": true,
+    "sboTerms": {
+	"omitGenericTerms": false
+    },
+    "polishing": {
+	"reactions": {
+	    "checkMassBalance": true,
+	    "fluxObjectives": {
+		"objectives": [ ],
+		"coefficients": [ ]
+	    }
+	}
+    },
+    "annotation": {
+	"bigg": {
+	    "annotateWithBigg": false,
+	    "includeAnyUri": true,
+	    "documentTitlePattern": "string",
+	    "notes": {
+		"useModelNotes": true
+	    }
+	},
+	"annotateDb": {
+	    "annotateWithAdb": false
+	}
+    },
+    "output": "xml"
+}

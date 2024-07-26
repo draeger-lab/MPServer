@@ -1,0 +1,248 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Model Polisher API",
+    "description": "API for the Model Polisher.",
+    "version": "2.1"
+  },
+  "servers": [
+    {
+      "url": "https://BioDatA.informatik.uni-halle.de/modeling/polisher/v2.1/",
+      "description": "Production"
+    }
+  ],
+  "paths": {
+    "/submit/file": {
+      "post": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/mixed": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "config": {
+                    "$ref": "#/components/schemas/config"
+                  },
+                  "modelFile": {
+                    "$ref": "#/components/schemas/binaryModelFile"
+                  },
+                  "modelNotesFile": {
+                    "$ref": "#/components/schemas/modelNotesFile"
+                  },
+                  "documentNotesFile": {
+                    "$ref": "#/components/schemas/documentNotesFile"
+                  }
+                },
+                "required": [
+                  "modelFile",
+                  "config"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "runId": {
+                      "$ref": "#/components/schemas/runId"
+                    },
+                    "diff": {
+                      "$ref": "#/components/schemas/diff"
+                    },
+                    "modelFile": {
+                      "$ref": "#/components/schemas/base64ModelFile"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Internal Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Full Run"
+        ],
+        "summary": "Upload a model file and parameters for the ModelPolisher."
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "runId": {
+        "title": "Run ID",
+        "description": "UID that identifies this Model Polisher run on the server. Include this in error reports.",
+        "type": "string"
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "invalid configuration parameters",
+              "model file not readable",
+              "internal server error"
+            ],
+            "context": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "base64ModelFile": {
+        "title": "Base64-Encoded Model File",
+        "description": "Base64-Encoded model file - either XML, JSON or COMBINE archive",
+        "type": "string",
+        "format": "byte"
+      },
+      "binaryModelFile": {
+        "title": "Binary Model File",
+        "description": "Binary model file - either XML, JSON or COMBINE archive",
+        "type": "string",
+        "format": "binary"
+      },
+      "modelNotesFile": {
+        "type": "string",
+        "format": "binary",
+        "description": "Binary of the model notes input file."
+      },
+      "documentNotesFile": {
+        "type": "string",
+        "format": "binary",
+        "description": "Binary of the document notes input file."
+      },
+      "config": {
+        "title": "Model Polisher Configuration",
+        "description": "Configuration Parameters for the Model Polisher.",
+        "type": "object",
+        "properties": {
+          "allowModelToBeSavedOnServer": {
+            "type": "boolean"
+          },
+          "sbmlValidation": {
+            "type": "boolean"
+          },
+          "sboTerms": {
+            "type": "object",
+            "properties": {
+              "omitGenericTerms": {
+                "type": "boolean",
+                "default": false
+              }
+            }
+          },
+          "polishing": {
+            "type": "object",
+            "properties": {
+              "reactions": {
+                "type": "object",
+                "properties": {
+                  "checkMassBalance": {
+                    "type": "boolean"
+                  },
+                  "fluxObjectives": {
+                    "type": "object",
+                    "properties": {
+                      "objectives": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "coefficients": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "annotation": {
+            "type": "object",
+            "properties": {
+              "bigg": {
+                "type": "object",
+                "properties": {
+                  "annotateWithBigg": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "includeAnyUri": {
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "documentTitlePattern": {
+                    "type": "string"
+                  },
+                  "notes": {
+                    "type": "object",
+                    "properties": {
+                      "useModelNotes": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                }
+              },
+              "annotateDb": {
+                "type": "object",
+                "properties": {
+                  "annotateWithAdb": {
+                    "type": "boolean",
+                    "default": false
+                  }
+                }
+              }
+            }
+          },
+          "output": {
+            "type": "string",
+            "enum": [
+              "sbml",
+              "json",
+              "combine"
+            ],
+            "default": "sbml"
+          }
+        }
+      },
+      "diff": {
+        "title": "Summary of Differences after Polishing",
+        "type": "array",
+        "items": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}
