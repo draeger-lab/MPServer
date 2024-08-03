@@ -3,3 +3,4 @@
 /jsbml.log
 /models
 resources/registry.json
+/development/codegen/*.jar
