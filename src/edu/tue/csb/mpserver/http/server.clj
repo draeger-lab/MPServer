@@ -18,7 +18,7 @@
 (def app
   (ring/ring-handler
    (ring/router
-    ["/api"
+    [""
      ["/submit"
       ["/file" {:post {:handler    handler/submit-handler
                        :middleware [wrap-params
@@ -31,10 +31,11 @@
                               :description "API for the Model Polisher."
                               :version     polishing/model-polisher-version}}
              :handler (fn [_]
-                           (response/response (io/input-stream
-                                               (io/resource "openapi.json"))))}}]
+                        (-> (io/resource "openapi.json")
+                            (io/input-stream)
+                            (response/response)))}}]
      ["/docs/*" {:no-doc true
-                 :get    (swagger-ui/create-swagger-ui-handler {:url "/api/openapi.json"})}]]
+                 :get    (swagger-ui/create-swagger-ui-handler {:url "/modelling/api/development/openapi.json"})}]]
     {:data     {:middleware [middleware/wrap-exception]}
      :validate rs/validate})
    (ring/routes ;; combine two handlers

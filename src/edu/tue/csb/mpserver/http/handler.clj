@@ -9,7 +9,7 @@
    [edu.tue.csb.mpserver.wrapper.polishing :as polishing]
    [edu.tue.csb.mpserver.diff :as diff])
   (:import
-   (edu.ucsd.sbrg ModelPolisherOptions$OutputType)
+   (edu.ucsd.sbrg.parameters ModelPolisherOptions$OutputType)
    (edu.ucsd.sbrg.io ModelWriter)
    (edu.ucsd.sbrg.resolver.identifiersorg IdentifiersOrg)
    (java.util Base64)
@@ -27,8 +27,8 @@
 (defn submit-handler [{:keys [multipart-params] :as req}]
   (let [run-id (str (random-uuid))] 
     (MDC/put "run.id" run-id)
-    (let [parameters (-> multipart-params (get "parameters") io/parameters-from-json)
-          file       (-> multipart-params (get "model-file") :tempfile)
+    (let [parameters (-> multipart-params (get "config") io/parameters-from-json)
+          file       (-> multipart-params (get "modelFile") :tempfile)
           saved-file (save-file! file)
           context    {:parameters parameters
                       :registry   (IdentifiersOrg.)

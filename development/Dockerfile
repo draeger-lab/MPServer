@@ -13,18 +13,15 @@ RUN curl -s https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/l
 
 RUN lein version
 
-
 RUN mkdir -p /etc/leiningen
 
 RUN echo "{:user {:plugins [[lein-localrepo \"0.5.4\"]]}}" > /etc/leiningen/profiles.clj
 
 WORKDIR /opt
 
-COPY . MPServer
-
 EXPOSE 3000
 
-COPY dev/startup.sh /usr/local/bin/startup.sh
+COPY development/startup.sh /usr/local/bin/startup.sh
 
 RUN chmod +x /usr/local/bin/startup.sh
 

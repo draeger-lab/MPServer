@@ -7,13 +7,9 @@
   },
   "servers": [
     {
-      "url": "https://BioDatA.informatik.uni-halle.de/modeling/polisher/v2.1/",
-      "description": "Production"
-    },
-      {
-	  "url": "http://localhost:3000",
-	  "description": "Development"
-      }
+      "url": "https://biodata.informatik.uni-halle.de/modelling/api/development/",
+      "description": "Development"
+    }
   ],
   "paths": {
     "/submit/file": {

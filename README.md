@@ -1,7 +1,7 @@
 # MPServer
 Server Implementation for the [ModelPolisher 2.1](https://github.com/draeger-lab/ModelPolisher/tree/2.1).
 
-The corresponding (auto-generated) Python client library stub can be found [here](https://github.com/draeger-lab/MPClient).
+The corresponding Python client library stub can be found [here](https://github.com/draeger-lab/MPClient). Information on how to generate it is [here](#python-client).
 
 See the [Releases Page](https://github.com/draeger-lab/MPServer/releases/tag/pre-release) for a download of the standalone JAR.
 You can run it with 
@@ -20,7 +20,7 @@ java -jar model-polisher-server-1.0.0-SNAPSHOT-standalone.jar
 ``` bash
 curl -v -F "parameters=<config.json;type=application/json" \
         -F "model-file=@e_coli_core.xml" \
-        localhost:3000/api/submit/file -o result.json
+        localhost:3000/submit/file -o result.json
 ```
 
 **Note**: This assumes that in your current directory, you have [`config.json`](examples/config.json) and [`e_coli_core.xml`](http://bigg.ucsd.edu/models/e_coli_core). 
@@ -34,6 +34,16 @@ The `result.json` (or whatever you name it) should contain
 - a `runId` UUID which should be reflected in the server logs
 - a `diff` which reflects the changes to the model
 - `modelFile` which is the base64 encoded output file.
+
+## Development
+
+### Docker
+
+The container `schmirgel/mpserver:development` is configured to build ModelPolisher and MPServer from VCS on startup.
+
+### Python Client
+
+The Python client library can be generated using the [codegen script](development/codegen.sh). This requires to be the swagger-codegen-cli jar to be in the directory. It can be downloaded from Maven Central.
 
 ## Swagger UI
 
