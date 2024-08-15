@@ -23,11 +23,11 @@
     (java.io/copy (java.io/file file) (java.io/file custom-path))
     (java.io/file custom-path)))
 
-
 (defn submit-handler [{:keys [multipart-params] :as req}]
   (let [run-id (str (random-uuid))] 
     (MDC/put "run.id" run-id)
-    (let [parameters (-> multipart-params (get "config") io/parameters-from-json)
+    (let [parameters (or (some-> multipart-params (get "config") io/parameters-from-json)
+                         io/p)
           file       (-> multipart-params (get "modelFile") :tempfile)
           saved-file (save-file! file)
           context    {:parameters parameters
