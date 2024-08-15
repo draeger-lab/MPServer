@@ -8,7 +8,7 @@
 (defn annotate-with-bigg! [^SBMLDocument doc {:keys [parameters registry observers]}]
   (let [bigg-params    (.. parameters (annotation) (biggAnnotationParameters))
         sbo-params     (.. parameters (sboTerms))
-        bigg           (BiGGDB. (DBParameters.))
+        bigg           (BiGGDB. (DBParameters. "bigg" "modelpolisher_biggdb_development" "postgres" (int 5432) "postgres"))
         bigg-annotator (BiGGSBMLAnnotator. bigg bigg-params sbo-params registry observers)]
     (.annotate bigg-annotator doc)))
 

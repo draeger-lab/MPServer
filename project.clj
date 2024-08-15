@@ -32,9 +32,11 @@
                    org.apache.logging.log4j/log4j-core
                    org.apache.logging.log4j/log4j-api
                    org.apache.logging.log4j/log4j-slf4j-impl]]
-                 [org.jdom/jdom2 "2.0.6"]
                  [de.unirostock.sems/CombineArchive "1.3.0"]
-
+                 
+                 [org.jdom/jdom2 "2.0.6"]
+                 [com.zaxxer/HikariCP "5.1.0"]
+                 [org.postgresql/postgresql "42.7.3"]
 
                  ;; dev time
                  [ring/ring-devel "1.12.2"]]
