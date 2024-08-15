@@ -39,6 +39,8 @@
         (polishing/polish! doc context)
         (when (parameters/annotate-with-bigg? parameters)
           (annotation/annotate-with-bigg! doc context))
+        (when (parameters/annotate-with-adb? parameters)
+          (annotation/annotate-with-adb! doc context))
         (let [input-stream (.write (ModelWriter. (parameters/output-type parameters))
                                    doc)]
           (log/debug "Done Writing.")
