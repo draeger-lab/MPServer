@@ -1,10 +1,11 @@
 (ns edu.tue.csb.mpserver.wrapper.io
+  (:require [clojure.java.io :as io])
   (:import
    (edu.ucsd.sbrg.io ModelReader)
    (edu.ucsd.sbrg.parameters Parameters ParametersParser)
    (edu.ucsd.sbrg.resolver.identifiersorg IdentifiersOrg)))
 
-(def p (let [input-stream (-> "{}"
+(def p (let [input-stream (-> (slurp (io/resource "default-config.json"))
                         (.getBytes)
                         (java.io.ByteArrayInputStream.))
        params (.parse (ParametersParser.)

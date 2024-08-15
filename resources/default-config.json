@@ -1,0 +1,17 @@
+{
+    "allow-model-to-be-saved-on-server": true,
+    "sbml-validation": true,
+    "sbo-terms": {
+	"add-generic-terms": true
+    },
+    "annotation": {
+	"bigg": {
+	    "annotate-with-bigg": true,
+	    "include-any-uri": true
+	},
+	"annotateDb": {
+	    "annotate-with-adb": true
+	}
+    },
+    "output": "xml"
+}
