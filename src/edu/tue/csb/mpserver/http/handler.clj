@@ -26,7 +26,8 @@
 (defn submit-handler [{:keys [multipart-params] :as req}]
   (let [run-id (str (random-uuid))] 
     (MDC/put "run.id" run-id)
-    (let [parameters (or (some-> multipart-params (get "config") io/parameters-from-json)
+    (let [config     (some-> multipart-params (get "config"))
+          parameters (or (some-> config io/parameters-from-json)
                          io/p)
           file       (-> multipart-params (get "modelFile") :tempfile)
           saved-file (save-file! file)
@@ -36,6 +37,8 @@
           doc        (io/read-file saved-file parameters)
           old-doc    (.clone doc)]
       (do
+        (log/debug "Received parameters:" (prn-str parameters))
+        (log/info "Running with config:" (prn-str config))
         (polishing/polish! doc context)
         (when (parameters/annotate-with-bigg? parameters)
           (annotation/annotate-with-bigg! doc context))
@@ -46,8 +49,8 @@
           (log/debug "Done Writing.")
           (MDC/clear)
           {:status 200
-           :body   {:runId run-id
-                    :diff  (diff/diff old-doc doc)
+           :body   {:runId     run-id
+                    :diff      (diff/diff old-doc doc)
                     :modelFile (.encodeToString (Base64/getEncoder)
                                                 (IOUtils/toByteArray input-stream))}})))))
 
