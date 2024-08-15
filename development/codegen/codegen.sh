@@ -2,17 +2,14 @@
 
 java \
     -Dapis \
-    -Dmodels \
     -DsupportingFiles \
-    -jar swagger-codegen-cli-3.0.59.jar generate \
-    -i ../resources/openapi.json \
-    --remove-operation-id-prefix true \
+    -jar swagger-codegen-cli-3.0.61.jar generate \
+    -i ../../resources/openapi.json \
     --model-package parameters \
     --api-package endpoints \
-    --flatten-inline-schema true \
     -l python \
     -c swagger-codegen-config.json \
-    -o ../../MPClient
+    -o ../../../MPClient
 
 
  
