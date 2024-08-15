@@ -2,6 +2,7 @@
 
 java \
     -Dapis \
+    -Dmodels \
     -DsupportingFiles \
     -jar swagger-codegen-cli-3.0.61.jar generate \
     -i ../../resources/openapi.json \
