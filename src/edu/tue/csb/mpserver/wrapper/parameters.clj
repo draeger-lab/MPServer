@@ -13,6 +13,7 @@
                        input-stream)]
     params))
 
+
 (defn parameters-from-json [input]
   (try
     (let [default      (json/parse-string (slurp (io/resource "default-config.json")))

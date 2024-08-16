@@ -9,7 +9,7 @@
 	    "annotate-with-bigg": true,
 	    "include-any-uri": true
 	},
-	"annotateDb": {
+	"annotatedb": {
 	    "annotate-with-adb": true
 	}
     },
