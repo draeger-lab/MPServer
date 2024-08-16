@@ -67,7 +67,7 @@
     [{:keys [multipart-params run-id] :as req}]
     (let [config     (some-> multipart-params
                              (get "config"))
-          parameters (or (parameters/parameters-from-json "{}")
+          parameters (or (parameters/parameters-from-json config)
                          parameters/default-parameters)
           file       (-> multipart-params
                          (get "modelFile")
@@ -93,9 +93,13 @@
           old-doc            (.clone sbml-doc)
           resp               (handler req)]
       (log/debug "Calculating diff.")
-      (let [diff  (diff/diff old-doc sbml-doc)]
-        (log/debug "Done calculating diff.")
-        (assoc-in resp [:body :diff] diff)))))
+      (try
+        (let [diff  (diff/diff old-doc sbml-doc)]
+          (log/debug "Done calculating diff.")
+          (assoc-in resp [:body :diff] diff))
+        (catch Throwable t
+          (log/error t "Failed diff.")
+          (assoc-in resp [:body :diff] {:message "Sorry, calculating the diff failed for some reason."}))))))
 
 (defn wrap-with-save-file! [handler]
   (fn wrapped-with-save-file-handler

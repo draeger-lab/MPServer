@@ -8,12 +8,12 @@
    (edu.ucsd.sbrg.parameters DBParameters)))
 
 (defn init-bigg-db []
-  (BiGGDB/init (DBParameters. "bigg" "localhost" "postgres" (int 1310) "postgres")
-               #_(DBParameters.)))
+  (BiGGDB/init #_(DBParameters. "bigg" "localhost" "postgres" (int 1310) "postgres")
+               (DBParameters.)))
 
 (defn init-adb-db []
-  (AnnotateDB/init (DBParameters. "adb" "localhost" "postgres" (int 1013) "postgres")
-                   #_(DBParameters.)))
+  (AnnotateDB/init #_(DBParameters. "adb" "localhost" "postgres" (int 1013) "postgres")
+                   (DBParameters.)))
 
 (defstate bigg-db
   :start

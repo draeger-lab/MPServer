@@ -1,32 +1,20 @@
 (ns edu.tue.csb.mpserver.diff
-    (:require
-   [clojure.java.io :as java.io]
+  (:require
    [clojure.data]
-   [clojure.pprint :as pprint]
-   [clojure.string :as str]
-   [edu.tue.csb.mpserver.wrapper.annotation :as annotation]
-   [edu.tue.csb.mpserver.wrapper.io :as io]
-   [edu.tue.csb.mpserver.wrapper.polishing :as polishing]
-   [edu.tue.csb.mpserver.wrapper.parameters :as parameters]
    [clojure.tools.logging :as log])
   (:import
    (java.lang.reflect Method)
-   (edu.ucsd.sbrg.resolver.identifiersorg IdentifiersOrg)
-   (edu.ucsd.sbrg.io ModelWriter)
-   (org.slf4j MDC)
-   (edu.ucsd.sbrg.reporting ProgressObserver ProgressUpdate ReportType)
-   (org.sbml.jsbml SBMLDocument Model)))
-
+   (org.sbml.jsbml SBMLDocument)))
 
 (defn model [doc] (.. doc (getModel)))
-(defn units [doc] (.. doc (getModel) (getListOfUnitDefinitions)))
-(defn compartments [doc] (.. doc (getModel) (getListOfCompartments)))
-(defn species [doc] (.. doc (getModel) (getListOfSpecies)))
-(defn parameters [doc] (.. doc (getModel) (getListOfParameters)))
-(defn reactions [doc] (.. doc (getModel) (getListOfReactions)))
+(defn units [doc] (vec (.. doc (getModel) (getListOfUnitDefinitions))))
+(defn compartments [doc] (vec (.. doc (getModel) (getListOfCompartments))))
+(defn species [doc] (vec (.. doc (getModel) (getListOfSpecies))))
+(defn parameters [doc] (vec (.. doc (getModel) (getListOfParameters))))
+(defn reactions [doc] (vec (.. doc (getModel) (getListOfReactions))))
 (defn fbc [doc] (.. doc (getModel) (getPlugin "fbc")))
-(defn objectives [doc] (-> doc fbc (.. (getListOfObjectives))))
-(defn gene-products [doc] (-> doc fbc (.. (getListOfGeneProducts))))
+(defn objectives [doc] (-> doc fbc (.. (getListOfObjectives)) vec))
+(defn gene-products [doc] (-> doc fbc (.. (getListOfGeneProducts)) vec))
 
 #_(defn annotation [element] (.. element (getAnnotation)))
 (defn has-method? [obj method-name]
@@ -37,7 +25,7 @@
   (let [method (.getMethod (class obj) method-name (into-array Class (map class args)))]
     (.invoke method obj (into-array Object args))))
 (defn annotation [obj]
-    (when (has-method? obj "getAnnotation")
+  (when (has-method? obj "getAnnotation")
     (call-method obj "getAnnotation")))
 (defn cv-terms [a] (when a (.. a (getListOfCVTerms))))
 (defn resources [cv] (.. cv (getResources)))
@@ -45,8 +33,11 @@
 (defmulti id type)
 (defmethod id :default [x] (.getId x))
 (defmethod id org.sbml.jsbml.CVTerm [x] (.toString (.getQualifierType x)))
+(defmethod id org.sbml.jsbml.SBMLDocument [x] :sbml-doc)
+(defmethod id org.sbml.jsbml.Annotation [x] :annotation)
 
 (defn ids [coll] (into #{} (map id coll)))
+
 
 (defn primitive-types [[k v]]
   (and (#{java.lang.Long
@@ -59,13 +50,15 @@
        (not (#{:treeNodeChangeListenerCount
                :annotationString
                :fullAnnotationString
+               :nonRDFannotationAsString
+               :locationURI
                "allowsChildren"}
              k))))
 
 (defn both-nan? [x y]
   (and (= java.lang.Double (type x) (type y))
-                       (Double/isNaN x)
-                       (Double/isNaN y)))
+       (Double/isNaN x)
+       (Double/isNaN y)))
 
 (defmulti reduced-bean type)
 (defmethod reduced-bean org.sbml.jsbml.ext.fbc.GeneProduct [gp]
@@ -97,140 +90,71 @@
 (def new-compartments (partial new-stuff compartments))
 
 (defn deleted-stuff [accessor old-doc new-doc]
-    (clojure.set/difference
-     (ids (accessor old-doc))
-     (ids (accessor new-doc))))
-
-(def deleted-reactions (partial deleted-stuff reactions))
-(def deleted-species (partial deleted-stuff species))
-
+  (clojure.set/difference
+   (ids (accessor old-doc))
+   (ids (accessor new-doc))))
 
 (defn contained-in-both? [accessor old-doc new-doc]
   (complement #((deleted-stuff accessor old-doc new-doc) (id %))))
 
-(def my-diff)
+(defn beanify [s]
+  (let [a (annotation s)
+        cv (cv-terms a)]
+   (assoc (reduced-bean s)
+          :annotation
+          (assoc (reduced-bean a)
+                 :cv-terms (zipmap (map #(.. % getQualifier toString) cv) (map resources cv))))))
 
-(defn map-of-diff-maps
-  ([accessor diff-fn old-stuff new-stuff]
-   (->> (map (fn [x y]
-               [(id x) (diff-fn x y)])
-             (filter (contained-in-both? accessor old-stuff new-stuff)
-                     (accessor old-stuff))
-             (accessor new-stuff))
-        (into {})))
-  ([accessor old-stuff new-stuff]
-   (map-of-diff-maps accessor my-diff old-stuff new-stuff)))
+(defn ensure-same-keys [m1 m2]
+  (let [all-keys (set (concat (keys m1) (keys m2)))]
+    [(merge (zipmap all-keys (repeat nil)) m1)
+     (merge (zipmap all-keys (repeat nil)) m2)]))
 
-
-(defn cv-term-diff [cv-old cv-new]
-  (let [diff                    (my-diff cv-old cv-new)
-        old-resources           (into (sorted-set) (resources cv-old))
-        new-resources           (into (sorted-set) (resources cv-new))
-        [only-a only-b in-both] (clojure.data/diff old-resources
-                                                   new-resources)]
-    (if (and (not-empty only-a)
-             (not-empty only-b))
-      (assoc diff :resources [old-resources new-resources])
-      diff)))
-
-(defn annotation-diff [a-old a-new]
-  (let [diff         (my-diff a-old a-new)
-        new-cv-terms (map id (new-stuff cv-terms a-old a-new))
-        cv-terms     (map-of-diff-maps cv-terms cv-term-diff a-old a-new)]
-    (cond-> diff
-      (not-empty new-cv-terms) (assoc :new-cv-terms new-cv-terms)
-      (not-empty cv-terms) (assoc :cv-terms cv-terms))))
-
-(defn my-diff [e1 e2]
-  (let [diff      (->> (clojure.data/diff (reduced-bean e1)
-                                          (reduced-bean e2))
-                       ((fn [[only-in-a only-in-b]]
-                          (let [missing-keys-in-a (clojure.set/difference (set (keys only-in-b))
-                                                                          (set (keys only-in-a)))
-                                missing-keys-in-b (clojure.set/difference (set (keys only-in-a))
-                                                                          (set (keys only-in-b)))]
-                            [(into (or only-in-a {}) (zipmap missing-keys-in-a (repeat nil)))
-                             (into (or only-in-b {}) (zipmap missing-keys-in-b (repeat nil)))])))
-                       (apply (partial merge-with vector))
-                       (map (fn [[k v]]
-                              (if-not (vector? v)
-                                [k [nil v]]
-                                [k v])))
-                       (filter (fn [[k [v1 v2]]] (not (both-nan? v1 v2))))
-                       (into {}))
-        a1        (annotation e1)
-        a2        (annotation e2)
-        anno-diff (when-not (= nil a1 a2 #_#_#_org.sbml.jsbml.Annotation (type e1) (type e2))
-                    (annotation-diff a1 a2))]
-    (if (not-empty anno-diff)
-      (assoc diff :annotation anno-diff)
-      diff)))
-
+(defn new-diff [accessor old-doc new-doc]
+  (let [[c1 c2] (ensure-same-keys
+                 (zipmap
+                  (map id (accessor old-doc))
+                  (map beanify (accessor old-doc)))
+                 (zipmap
+                  (map id (accessor new-doc))
+                  (map beanify (accessor new-doc))))]
+       (->> (clojure.data/diff c1 c2)
+            (take 2)
+            (apply
+             clojure.data/diff)
+            (apply (partial merge-with vector))
+            (map (fn [[k [v1 v2]]]
+                   (if-not (or (nil? v1)
+                               (nil? v2))
+                     (let [[c1 c2] (ensure-same-keys v1 v2)
+                           vs (->> (merge-with vector c1 c2)
+                                   (filter (fn [[k [v1 v2]]] (not (both-nan? v1 v2))))
+                                   (into {}))]
+                       (when (not-empty vs)
+                         [k vs]))
+                     [k [v1 v2]])))
+            (filter some?)
+            (into {}))))
 
 (defn diff [^SBMLDocument old-doc ^SBMLDocument new-doc]
   (log/debug "Diff!")
-  (let [unit-diffs         (future (map-of-diff-maps units old-doc new-doc))
-        compartment-diffs  (future (map-of-diff-maps compartments old-doc new-doc))
-        species-diffs      (future (map-of-diff-maps species old-doc new-doc))
-        parameters-diffs   (future (map-of-diff-maps parameters old-doc new-doc))
-        reactions-diffs    (future (map-of-diff-maps reactions old-doc new-doc))
-        objectives-diffs   (future (map-of-diff-maps objectives old-doc new-doc))
-        gene-product-diffs (future (map-of-diff-maps gene-products old-doc new-doc))]
-    {:sbml                     (do (log/debug "diff sbml") (time (my-diff old-doc new-doc)))
-     :model                    (do (log/debug "diff model") (time (my-diff (model old-doc) (model new-doc))))
+  (let [unit-diffs         (future (new-diff units old-doc new-doc))
+        compartment-diffs  (future (new-diff compartments old-doc new-doc))
+        species-diffs      (future (new-diff species old-doc new-doc))
+        parameters-diffs   (future (new-diff parameters old-doc new-doc))
+        reactions-diffs    (future (new-diff reactions old-doc new-doc))
+        objectives-diffs   (future (new-diff objectives old-doc new-doc))
+        gene-product-diffs (future (new-diff gene-products old-doc new-doc))]
+    {:sbml                     (do (log/debug "diff sbml") (time (new-diff (comp vector identity) old-doc new-doc)))
+     :model                    (do (log/debug "diff model") (time (new-diff (comp vector model) old-doc new-doc)))
      :units                    (do (log/debug "diff units") (time @unit-diffs))
-     :newUnits                 (do (log/debug "new units") (time (ids (new-units old-doc new-doc))))
      :compartments             (do (log/debug "diff compartments") (time @compartment-diffs))
-     #_#_:deleted-species-ids  (deleted-species old-doc new-doc) 
      :species                  (do (log/debug "diff species") (time @species-diffs))
      :parameters               (do (log/debug "diff parameters") (time @parameters-diffs))
-     :annotation               (do (log/debug "diff annotation") (time (annotation-diff (annotation old-doc) (annotation new-doc))))
-     #_#_:deleted-reaction-ids (deleted-reactions old-doc new-doc) 
+     :annotation               (do (log/debug "diff annotation") (time (new-diff (comp vector annotation) old-doc new-doc)))
      :reactions                (do (log/debug "diff reactions") (time @reactions-diffs))
      :fbc                      {:objectives   (do (log/debug "diff objectives") (time @objectives-diffs))
                                 :geneProducts (do (log/debug "diff geneProducts") (time @gene-product-diffs))}}))
 
-
-(def new-doc (io/read-file (java.io/file (java.io/resource "tst.xml")) parameters/default-parameters))
-(def old-doc (io/read-file (java.io/file (java.io/resource "iAF1260.xml")) parameters/default-parameters))
-
-(def diffmap (map-of-diff-maps species old-doc new-doc))
-
-(filter (fn [[k v]] (-> v
-                        (dissoc :annotation)
-                        not-empty)) diffmap)
-
-(defn verwirrter-shit
-  [[only-in-a only-in-b]]
-  (let [missing-keys-in-a
-        (clojure.set/difference (set (keys only-in-b))
-                                (set (keys only-in-a)))
-        missing-keys-in-b
-        (clojure.set/difference (set (keys only-in-a))
-                                (set (keys only-in-b)))]
-    [(into (or only-in-a {}) (zipmap missing-keys-in-a (repeat nil)))
-     (into (or only-in-b {}) (zipmap missing-keys-in-b (repeat nil)))]))
-
-(apply (partial merge-with vector)
- (verwirrter-shit
-  (clojure.data/diff (reduced-bean (first (filter #(= (id %) "M_xtsn_p") (species old-doc))))
-                     (assoc (reduced-bean (first (filter #(= (id %) "M_xtsn_p") (species new-doc))))
-                            :setConstant false))))
-
-
-
-;; das hier ist ein Bug!
-#_[#{"http://identifiers.org/rhea/16109"
-     "http://identifiers.org/bigg.reaction/PFK"
-     "http://identifiers.org/metanetx.reaction/MNXR102507"
-     "http://identifiers.org/rhea/16112"}
-   #{"https://identifiers.org/ec-code/2.7.1.11"
-     "https://identifiers.org/metanetx.reaction/MNXR102507"
-     "https://identifiers.org/rhea/16111"
-     "https://identifiers.org/rhea/16110"
-     "https://identifiers.org/rhea/16112"
-     "https://identifiers.org/rhea/16109"
-     "https://identifiers.org/bigg.reaction/PFK"}
-   #{"http://identifiers.org/ec-code/2.7.1.11"
-     "http://identifiers.org/rhea/16111"
-     "http://identifiers.org/rhea/16110"}]
+;; (def new-doc (io/read-file (java.io/file (java.io/resource "tst.xml")) parameters/default-parameters))
+;; (def old-doc (io/read-file (java.io/file (java.io/resource "iAF1260.xml")) parameters/default-parameters))

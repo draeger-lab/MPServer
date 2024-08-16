@@ -24,7 +24,7 @@
                  [ch.qos.logback/logback-classic "1.2.3"]
                  [cheshire "5.13.0"]
                  
-                 [edu.ucsd.sbrg.ModelPolisher "2.1.2"]
+                 [edu.ucsd.sbrg.ModelPolisher "2.1.4"]
                  [de.zbit.SysBio/SysBio "1390"]
                  [org.sbml.jsbml/jsbml "1.6.1" :exclusions
                   [commons-logging
