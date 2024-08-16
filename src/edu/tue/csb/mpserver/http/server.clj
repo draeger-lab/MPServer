@@ -24,16 +24,13 @@
                                     middleware/wrap-with-context
                                     middleware/wrap-with-diff
                                     middleware/wrap-with-save-file!]}}]]
-     
+     ;; this exposes the OpenAPI spec ..
      ["/openapi.json"
-      {:get {:no-doc  true
-             :openapi {:info {:title       "Model Polisher API"
-                              :description "API for the Model Polisher."
-                              :version     polishing/model-polisher-version}}
-             :handler (fn [_]
+      {:get {:handler (fn [_]
                         (-> (io/resource "openapi.json")
                             (io/input-stream)
                             (response/response)))}}]
+     ;; ... which is used by the swagger UI (unfortunately with full path at the moment)
      ["/docs/*" {:no-doc true
                  :get    (swagger-ui/create-swagger-ui-handler
                           {:url "/modelling/api/development/openapi.json"})}]]
@@ -44,7 +41,6 @@
    (ring/routes ;; combine two handlers
       (ring/redirect-trailing-slash-handler)
       (ring/create-default-handler
-       ;; wird geworfen bei nil return value und fälschlich als 400er rausgegeben
        {:not-acceptable (constantly {:status 406, :body ""})}))))
 
 #_(.stop jetty)
@@ -55,10 +51,14 @@
                   :join? false
                   :send-server-version? false})))
 
+;; see core namespace: this is some magic component framework stuff
+;; which serves to start up system components/objects on startup
 (defstate http-server
   :start (-> app
              (run-jetty {:port 3000
+                         ;; otherwise this would be blocking
                          :join? false
+                         ;; otherwise our server goes advertising what kind of server he is and why should he
                          :send-server-version? false}))
   :stop (.stop http-server))
 

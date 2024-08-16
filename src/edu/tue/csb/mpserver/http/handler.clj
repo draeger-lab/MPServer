@@ -14,7 +14,7 @@
         (annotation/annotate-with-bigg! sbml-doc context))
       (when (parameters/annotate-with-adb? (-> context :parameters))
         (annotation/annotate-with-adb! sbml-doc context))
-      (let [base64-model (io/write-doc-to-base64 context sbml-doc)]
+      (let [base64-model (io/sbml-doc->base64 context sbml-doc)]
         {:status 200
          :body   {:runId     run-id
                   :modelFile base64-model}}))))

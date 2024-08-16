@@ -9,7 +9,9 @@
    (org.apache.commons.io IOUtils)
    (java.util Base64)))
 
-(defn read-file [input ^Parameters params]
+(defn read-file
+  "Wrapper for ModelPolisher's ModelReader."
+  [input ^Parameters params]
   (try
     (let [registry (IdentifiersOrg.)]
       (.read (ModelReader. (.sboTerms params) registry) input))
@@ -21,12 +23,14 @@
                       e)))))
 
 
-(defn- input-stream->base64 [input-stream]
+(defn- input-stream->base64
+  [input-stream]
   (.encodeToString (Base64/getEncoder)
                    (IOUtils/toByteArray input-stream)))
 
 
-(defn write-doc-to-base64 [context sbml-doc]
+(defn sbml-doc->base64
+  [context sbml-doc]
   (log/debug "Encoding model to base64.")
   (let [writer       (ModelWriter.
                       (parameters/output-type (-> context :parameters)))

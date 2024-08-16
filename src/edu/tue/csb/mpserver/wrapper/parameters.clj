@@ -1,5 +1,7 @@
 (ns edu.tue.csb.mpserver.wrapper.parameters
-  (:require [clojure.java.io :as io])
+  (:require
+   [cheshire.core :as json]
+   [clojure.java.io :as io])
   (:import
    (edu.ucsd.sbrg.parameters Parameters ParametersParser)))
 
@@ -13,7 +15,13 @@
 
 (defn parameters-from-json [input]
   (try
-    (let [input-stream (-> input
+    (let [default      (json/parse-string (slurp (io/resource "default-config.json")))
+          ;; this somewhat awkward bit serves to define server-side defaults (in particular: use annotation)
+          defaulted-input (->> input
+                               json/parse-string
+                               (merge default)
+                               json/generate-string)
+          input-stream (-> defaulted-input
                            (.getBytes)
                            (java.io.ByteArrayInputStream.))]
       (.parse (ParametersParser.)
