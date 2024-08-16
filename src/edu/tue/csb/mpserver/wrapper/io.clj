@@ -1,29 +1,13 @@
 (ns edu.tue.csb.mpserver.wrapper.io
-  (:require [clojure.java.io :as io])
+  (:require
+   [clojure.tools.logging :as log]
+   [edu.tue.csb.mpserver.wrapper.parameters :as parameters])
   (:import
-   (edu.ucsd.sbrg.io ModelReader)
-   (edu.ucsd.sbrg.parameters Parameters ParametersParser)
-   (edu.ucsd.sbrg.resolver.identifiersorg IdentifiersOrg)))
-
-(def p (let [input-stream (-> (slurp (io/resource "default-config.json"))
-                        (.getBytes)
-                        (java.io.ByteArrayInputStream.))
-       params (.parse (ParametersParser.)
-                      input-stream)]
-         params))
-
-(defn parameters-from-json [input]
-  (try
-    (let [input-stream (-> input
-                           (.getBytes)
-                           (java.io.ByteArrayInputStream.))]
-      (.parse (ParametersParser.)
-              input-stream))
-    (catch Exception e
-      (throw (ex-info "Parsing parameters failed"
-                      {:type  :parse/parameters
-                       :input input}
-                      e)))))
+   (edu.ucsd.sbrg.io ModelReader ModelWriter)
+   (edu.ucsd.sbrg.parameters Parameters)
+   (edu.ucsd.sbrg.resolver.identifiersorg IdentifiersOrg)
+   (org.apache.commons.io IOUtils)
+   (java.util Base64)))
 
 (defn read-file [input ^Parameters params]
   (try
@@ -35,3 +19,18 @@
                        :input  input
                        :params params}
                       e)))))
+
+
+(defn- input-stream->base64 [input-stream]
+  (.encodeToString (Base64/getEncoder)
+                   (IOUtils/toByteArray input-stream)))
+
+
+(defn write-doc-to-base64 [context sbml-doc]
+  (log/debug "Encoding model to base64.")
+  (let [writer       (ModelWriter.
+                      (parameters/output-type (-> context :parameters)))
+        input-stream (.write writer sbml-doc)
+        result       (input-stream->base64 input-stream)]
+    (log/debug "Done encoding.")
+    result))

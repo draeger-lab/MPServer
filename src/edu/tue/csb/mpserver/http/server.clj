@@ -6,7 +6,6 @@
    [edu.tue.csb.mpserver.wrapper.polishing :as polishing]
    [mount.core :refer [defstate]]
    [reitit.ring :as ring]
-   [reitit.ring.spec :as rs]
    [reitit.swagger-ui :as swagger-ui]
    [ring.adapter.jetty :refer [run-jetty]]
    [ring.middleware.reload :refer [wrap-reload]]
@@ -21,9 +20,10 @@
     [""
      ["/submit"
       ["/file" {:post {:handler    handler/submit-handler
-                       :middleware [wrap-params
-                                    wrap-multipart-params
-                                    wrap-json-response]}}]]
+                       :middleware [wrap-json-response
+                                    middleware/wrap-with-context
+                                    middleware/wrap-with-diff
+                                    middleware/wrap-with-save-file!]}}]]
      
      ["/openapi.json"
       {:get {:no-doc  true
@@ -35,28 +35,31 @@
                             (io/input-stream)
                             (response/response)))}}]
      ["/docs/*" {:no-doc true
-                 :get    (swagger-ui/create-swagger-ui-handler {:url "/modelling/api/development/openapi.json"})}]]
-    {:data     {:middleware [middleware/wrap-exception]}
-     :validate rs/validate})
+                 :get    (swagger-ui/create-swagger-ui-handler
+                          {:url "/modelling/api/development/openapi.json"})}]]
+    {:data     {:middleware [middleware/wrap-mdc!
+                             middleware/wrap-exception
+                             wrap-params
+                             wrap-multipart-params]}})
    (ring/routes ;; combine two handlers
       (ring/redirect-trailing-slash-handler)
       (ring/create-default-handler
        ;; wird geworfen bei nil return value und fälschlich als 400er rausgegeben
        {:not-acceptable (constantly {:status 406, :body ""})}))))
 
-
-
 #_(.stop jetty)
 #_(def jetty
   (-> (wrap-reload #'app)
       #_app
       (run-jetty {:port 3000
-                  :join? false})))
+                  :join? false
+                  :send-server-version? false})))
 
 (defstate http-server
   :start (-> app
              (run-jetty {:port 3000
-                         :join? false}))
+                         :join? false
+                         :send-server-version? false}))
   :stop (.stop http-server))
 
 ;; (mount/start #'http-server)

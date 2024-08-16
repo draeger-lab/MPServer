@@ -168,38 +168,69 @@
 
 
 (defn diff [^SBMLDocument old-doc ^SBMLDocument new-doc]
-  {:sbml                 (my-diff old-doc new-doc)
-   :model                (my-diff (model old-doc) (model new-doc))
-   :units                (map-of-diff-maps units old-doc new-doc)
-   :newUnits            (ids (new-units old-doc new-doc))
-   :compartments         (map-of-diff-maps compartments old-doc new-doc)
-   #_#_:deleted-species-ids  (deleted-species old-doc new-doc) 
-   :species              (map-of-diff-maps species old-doc new-doc)
-   :parameters           (map-of-diff-maps parameters old-doc new-doc)
-   :annotation           (annotation-diff (annotation old-doc) (annotation new-doc))
-   #_#_:deleted-reaction-ids (deleted-reactions old-doc new-doc) 
-   :reactions            (map-of-diff-maps reactions old-doc new-doc)
-   :fbc                  {:objectives    (map-of-diff-maps objectives old-doc new-doc)
-                          :geneProducts (map-of-diff-maps gene-products old-doc new-doc)}})
+  (log/debug "Diff!")
+  (let [unit-diffs         (future (map-of-diff-maps units old-doc new-doc))
+        compartment-diffs  (future (map-of-diff-maps compartments old-doc new-doc))
+        species-diffs      (future (map-of-diff-maps species old-doc new-doc))
+        parameters-diffs   (future (map-of-diff-maps parameters old-doc new-doc))
+        reactions-diffs    (future (map-of-diff-maps reactions old-doc new-doc))
+        objectives-diffs   (future (map-of-diff-maps objectives old-doc new-doc))
+        gene-product-diffs (future (map-of-diff-maps gene-products old-doc new-doc))]
+    {:sbml                     (do (log/debug "diff sbml") (time (my-diff old-doc new-doc)))
+     :model                    (do (log/debug "diff model") (time (my-diff (model old-doc) (model new-doc))))
+     :units                    (do (log/debug "diff units") (time @unit-diffs))
+     :newUnits                 (do (log/debug "new units") (time (ids (new-units old-doc new-doc))))
+     :compartments             (do (log/debug "diff compartments") (time @compartment-diffs))
+     #_#_:deleted-species-ids  (deleted-species old-doc new-doc) 
+     :species                  (do (log/debug "diff species") (time @species-diffs))
+     :parameters               (do (log/debug "diff parameters") (time @parameters-diffs))
+     :annotation               (do (log/debug "diff annotation") (time (annotation-diff (annotation old-doc) (annotation new-doc))))
+     #_#_:deleted-reaction-ids (deleted-reactions old-doc new-doc) 
+     :reactions                (do (log/debug "diff reactions") (time @reactions-diffs))
+     :fbc                      {:objectives   (do (log/debug "diff objectives") (time @objectives-diffs))
+                                :geneProducts (do (log/debug "diff geneProducts") (time @gene-product-diffs))}}))
 
 
+(def new-doc (io/read-file (java.io/file (java.io/resource "tst.xml")) parameters/default-parameters))
+(def old-doc (io/read-file (java.io/file (java.io/resource "iAF1260.xml")) parameters/default-parameters))
 
+(def diffmap (map-of-diff-maps species old-doc new-doc))
 
+(filter (fn [[k v]] (-> v
+                        (dissoc :annotation)
+                        not-empty)) diffmap)
+
+(defn verwirrter-shit
+  [[only-in-a only-in-b]]
+  (let [missing-keys-in-a
+        (clojure.set/difference (set (keys only-in-b))
+                                (set (keys only-in-a)))
+        missing-keys-in-b
+        (clojure.set/difference (set (keys only-in-a))
+                                (set (keys only-in-b)))]
+    [(into (or only-in-a {}) (zipmap missing-keys-in-a (repeat nil)))
+     (into (or only-in-b {}) (zipmap missing-keys-in-b (repeat nil)))]))
+
+(apply (partial merge-with vector)
+ (verwirrter-shit
+  (clojure.data/diff (reduced-bean (first (filter #(= (id %) "M_xtsn_p") (species old-doc))))
+                     (assoc (reduced-bean (first (filter #(= (id %) "M_xtsn_p") (species new-doc))))
+                            :setConstant false))))
 
 
 
 ;; das hier ist ein Bug!
 #_[#{"http://identifiers.org/rhea/16109"
-    "http://identifiers.org/bigg.reaction/PFK"
-    "http://identifiers.org/metanetx.reaction/MNXR102507"
-    "http://identifiers.org/rhea/16112"}
-  #{"https://identifiers.org/ec-code/2.7.1.11"
-    "https://identifiers.org/metanetx.reaction/MNXR102507"
-    "https://identifiers.org/rhea/16111"
-    "https://identifiers.org/rhea/16110"
-    "https://identifiers.org/rhea/16112"
-    "https://identifiers.org/rhea/16109"
-    "https://identifiers.org/bigg.reaction/PFK"}
-  #{"http://identifiers.org/ec-code/2.7.1.11"
-    "http://identifiers.org/rhea/16111"
-    "http://identifiers.org/rhea/16110"}]
+     "http://identifiers.org/bigg.reaction/PFK"
+     "http://identifiers.org/metanetx.reaction/MNXR102507"
+     "http://identifiers.org/rhea/16112"}
+   #{"https://identifiers.org/ec-code/2.7.1.11"
+     "https://identifiers.org/metanetx.reaction/MNXR102507"
+     "https://identifiers.org/rhea/16111"
+     "https://identifiers.org/rhea/16110"
+     "https://identifiers.org/rhea/16112"
+     "https://identifiers.org/rhea/16109"
+     "https://identifiers.org/bigg.reaction/PFK"}
+   #{"http://identifiers.org/ec-code/2.7.1.11"
+     "http://identifiers.org/rhea/16111"
+     "http://identifiers.org/rhea/16110"}]
