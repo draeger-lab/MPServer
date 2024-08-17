@@ -23,6 +23,8 @@
                  [org.slf4j/osgi-over-slf4j "1.7.32"]
                  [ch.qos.logback/logback-classic "1.2.3"]
                  [cheshire "5.13.0"]
+                 [clj-http "3.13.0"]
+                 [org.clojure/tools.cli "1.1.230"]
                  
                  [edu.ucsd.sbrg.ModelPolisher "2.1.4"]
                  [de.zbit.SysBio/SysBio "1390"]

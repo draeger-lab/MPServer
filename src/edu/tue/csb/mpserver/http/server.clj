@@ -12,9 +12,10 @@
    [ring.middleware.json :refer [wrap-json-response]]
    [ring.middleware.multipart-params :refer [wrap-multipart-params]]
    [ring.middleware.params :refer [wrap-params]]
-   [ring.util.response :as response]))
+   [ring.util.response :as response]
+   [mount.core :as mount]))
 
-(def app
+(defn app [subpath]
   (ring/ring-handler
    (ring/router
     [""
@@ -33,7 +34,7 @@
      ;; ... which is used by the swagger UI (unfortunately with full path at the moment)
      ["/docs/*" {:no-doc true
                  :get    (swagger-ui/create-swagger-ui-handler
-                          {:url "/modelling/api/development/openapi.json"})}]]
+                          {:url (str subpath "/openapi.json")})}]]
     {:data     {:middleware [middleware/wrap-mdc!
                              middleware/wrap-exception
                              wrap-params
@@ -54,12 +55,13 @@
 ;; see core namespace: this is some magic component framework stuff
 ;; which serves to start up system components/objects on startup
 (defstate http-server
-  :start (-> app
-             (run-jetty {:port 3000
-                         ;; otherwise this would be blocking
-                         :join? false
-                         ;; otherwise our server goes advertising what kind of server he is and why should he
-                         :send-server-version? false}))
+  :start (let [{:keys [port subpath]} (mount/args)]
+           (-> (app subpath)
+               (run-jetty {:port (int port)
+                           ;; otherwise this would be blocking
+                           :join? false
+                           ;; otherwise our server goes advertising what kind of server he is and why should he
+                           :send-server-version? false})))
   :stop (.stop http-server))
 
 ;; (mount/start #'http-server)
