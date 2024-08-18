@@ -53,12 +53,12 @@
         (log/trace "Clearing MDC.")
         response))))
 
-
 (defn- file-extension [filename]
   (let [parts (str/split filename #"\.")]
     (if (= 1 (count parts))
       nil
-      (str "." (last )))))
+      (str "." (last parts)))))
+
 
 (defn- temp-file [{:keys [tempfile filename] :as req}]
   (log/debug "file parameters:" req)
