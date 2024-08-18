@@ -20,7 +20,7 @@ echo "Bulding Model Polisher"
 ./gradlew jar -x test >/dev/null 2>&1
 
 echo "Installing Jar in local Maven repo"
-lein localrepo install target/ModelPolisher-2.1.jar edu.ucsd.sbrg.ModelPolisher 2.1 >/dev/null 2>&1
+lein localrepo install target/ModelPolisher-2.1.jar -p build/publications/maven/pom-default.xml edu.ucsd.sbrg.ModelPolisher 2.1 >/dev/null 2>&1
 
 cd /opt
 
