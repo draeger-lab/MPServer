@@ -7,7 +7,8 @@
    [edu.tue.csb.mpserver.http.server]
    [edu.tue.csb.mpserver.wrapper.db]
    [edu.tue.csb.mpserver.validate]
-   [mount.core :as mount]))
+   [mount.core :as mount]
+   [clojure.tools.logging :as log]))
 
 (defn exit [status msg]
   (println msg)
@@ -19,6 +20,8 @@
   (let [{:keys [action options exit-message ok?]} (args/validate-args args)]
     (if exit-message
       (exit (if ok? 0 1) exit-message)
-      (mount/start-with-args
-       (or #_(:config-file options)
-           (edn/read-string (slurp (io/resource "server-config.edn"))))))))
+      (do
+        (log/info "Running with config:" (:config-file options))
+        (mount/start-with-args
+         (or (:config-file options)
+             (edn/read-string (slurp (io/resource "server-config.edn")))))))))

@@ -11,10 +11,12 @@
   (let [config (mount/args)
         dir    (java.io/file (:save-models-path config))]
     (when (nil? dir)
-      (throw (ex-info "Need to set a directory for saving models 'save-models-path' in the config.")))
+      (throw (ex-info "Need to set a directory for saving models 'save-models-path' in the config."
+                      {:save-models-path (:save-models-path config)})))
     (when-not (or (and (.exists dir) (.canWrite dir))
                   (.mkdirs dir))
-      (throw (ex-info "Directory for saving models '" (:save-models-path config) "' cannot be created or is not writeable.")))
+      (throw (ex-info "Directory for saving models cannot be created or is not writeable."
+                      {:save-models-path (:save-models-path config)})))
     config)
   :stop
   nil)
