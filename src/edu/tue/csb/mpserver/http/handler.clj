@@ -20,7 +20,7 @@
         (fixing/fix! sbml-doc))
 
       (when (or (empty? (:validation pre-validation-results))
-                (parameters/polish-even-if-mode-invalid? mp-parameters))
+                (parameters/polish-even-if-model-invalid? mp-parameters))
         (polishing/polish! sbml-doc context))
 
       (when (parameters/annotate-with-bigg? mp-parameters)

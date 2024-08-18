@@ -47,5 +47,5 @@
 (defn dont-fix? [^Parameters params]
   (.. params (fixing) (dontFix)))
 
-(defn polish-even-if-mode-invalid? [^Parameters params]
+(defn polish-even-if-model-invalid? [^Parameters params]
   (.. params (fixing) (polishEvenIfModelInvalid)))

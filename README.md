@@ -9,7 +9,7 @@ You can run it with
 java -jar model-polisher-server-1.0.0-SNAPSHOT-standalone.jar
 ```
 
-[`config.json`](examples/config.json) can be used for testing specific flags.
+A [`config.json`](resources/default-request-config.json) can be used to determine behaviour.
 
 **Note**: 
 - Using BiGGDB will not work without a running BiGGDB instance. Right now the the DB-Config is hardcoded to use hostname `bigg`, which likely means that *for now you should not bother trying to use this*
