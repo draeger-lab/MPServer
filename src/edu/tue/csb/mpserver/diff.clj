@@ -1,7 +1,10 @@
 (ns edu.tue.csb.mpserver.diff
   (:require
    [clojure.data]
-   [clojure.tools.logging :as log])
+   [clojure.java.io :as java.io]
+   [clojure.tools.logging :as log]
+   [edu.tue.csb.mpserver.wrapper.io :as io]
+   [edu.tue.csb.mpserver.wrapper.parameters :as parameters])
   (:import
    (java.lang.reflect Method)
    (org.sbml.jsbml SBMLDocument)))
@@ -156,5 +159,5 @@
      :fbc                      {:objectives   (do (log/debug "diff objectives") (time @objectives-diffs))
                                 :geneProducts (do (log/debug "diff geneProducts") (time @gene-product-diffs))}}))
 
-;; (def new-doc (io/read-file (java.io/file (java.io/resource "tst.xml")) parameters/default-parameters))
-;; (def old-doc (io/read-file (java.io/file (java.io/resource "iAF1260.xml")) parameters/default-parameters))
+#_(def new-doc (io/read-file (java.io/file (java.io/resource "tst.xml")) parameters/default-parameters))
+#_(def old-doc (io/read-file (java.io/file (java.io/resource "iAF1260.xml")) parameters/default-parameters))

@@ -4,3 +4,4 @@
 /models
 resources/registry.json
 /development/codegen/*.jar
+/saved-models/

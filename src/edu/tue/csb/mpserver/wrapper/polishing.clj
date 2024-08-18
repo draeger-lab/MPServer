@@ -6,9 +6,9 @@
 (def model-polisher-version
   (.getImplementationVersion (.getPackage SBMLPolisher)))
 
-(defn polish! [^SBMLDocument doc {:keys [parameters registry observers]}]
-  (let [polisher (SBMLPolisher. (.polishing parameters)
-                                (.sboTerms parameters)
+(defn polish! [^SBMLDocument doc {:keys [mp-parameters registry observers]}]
+  (let [polisher (SBMLPolisher. (.polishing mp-parameters)
+                                (.sboTerms mp-parameters)
                                 registry
                                 observers)]
     (.polish polisher doc)))

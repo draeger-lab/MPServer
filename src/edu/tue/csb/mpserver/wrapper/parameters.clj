@@ -5,8 +5,9 @@
   (:import
    (edu.ucsd.sbrg.parameters Parameters ParametersParser)))
 
+
 (def default-parameters
-  (let [input-stream (-> (slurp (io/resource "default-config.json"))
+  (let [input-stream (-> (slurp (io/resource "default-request-config.json"))
                          (.getBytes)
                          (java.io.ByteArrayInputStream.))
         params (.parse (ParametersParser.)
@@ -16,7 +17,7 @@
 
 (defn parameters-from-json [input]
   (try
-    (let [default      (json/parse-string (slurp (io/resource "default-config.json")))
+    (let [default      (json/parse-string (slurp (io/resource "default-request-config.json")))
           ;; this somewhat awkward bit serves to define server-side defaults (in particular: use annotation)
           defaulted-input (->> input
                                json/parse-string
@@ -43,5 +44,8 @@
 (defn output-type [^Parameters params]
   (.. params (outputType)))
 
-;; (defn allow-save-on-server? [^Parameters params]
-;;   (.. params ()))
+(defn dont-fix? [^Parameters params]
+  (.. params (fixing) (dontFix)))
+
+(defn polish-even-if-mode-invalid? [^Parameters params]
+  (.. params (fixing) (polishEvenIfModelInvalid)))

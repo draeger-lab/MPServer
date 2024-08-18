@@ -4,7 +4,7 @@
    [edu.tue.csb.mpserver.http.handler :as handler]
    [edu.tue.csb.mpserver.http.middleware :as middleware]
    [edu.tue.csb.mpserver.wrapper.polishing :as polishing]
-   [mount.core :refer [defstate]]
+   [mount.core :refer [defstate] :as mount]
    [reitit.ring :as ring]
    [reitit.swagger-ui :as swagger-ui]
    [ring.adapter.jetty :refer [run-jetty]]
@@ -13,9 +13,9 @@
    [ring.middleware.multipart-params :refer [wrap-multipart-params]]
    [ring.middleware.params :refer [wrap-params]]
    [ring.util.response :as response]
-   [mount.core :as mount]))
+   [edu.tue.csb.mpserver.config :refer [app-config]]))
 
-(defn app [subpath]
+(def app
   (ring/ring-handler
    (ring/router
     [""
@@ -34,7 +34,7 @@
      ;; ... which is used by the swagger UI (unfortunately with full path at the moment)
      ["/docs/*" {:no-doc true
                  :get    (swagger-ui/create-swagger-ui-handler
-                          {:url (str subpath "/openapi.json")})}]]
+                          {:url (str (:subpath app-config) "/openapi.json")})}]]
     {:data     {:middleware [middleware/wrap-mdc!
                              middleware/wrap-exception
                              wrap-params
@@ -46,17 +46,17 @@
 
 #_(.stop jetty)
 #_(def jetty
-  (-> (wrap-reload #'app)
-      #_app
-      (run-jetty {:port 3000
-                  :join? false
-                  :send-server-version? false})))
+    (-> (wrap-reload #'app)
+        #_app
+        (run-jetty {:port 3000
+                    :join? false
+                    :send-server-version? false})))
 
 ;; see core namespace: this is some magic component framework stuff
 ;; which serves to start up system components/objects on startup
 (defstate http-server
-  :start (let [{:keys [port subpath]} (mount/args)]
-           (-> (app subpath)
+  :start (let [{:keys [port subpath]} app-config]
+           (-> app
                (run-jetty {:port (int port)
                            ;; otherwise this would be blocking
                            :join? false

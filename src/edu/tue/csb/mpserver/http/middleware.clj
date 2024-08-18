@@ -4,6 +4,7 @@
    [clojure.java.io :as java.io]
    [clojure.string :as str]
    [clojure.tools.logging :as log]
+   [edu.tue.csb.mpserver.config :refer [app-config]]
    [edu.tue.csb.mpserver.diff :as diff]
    [edu.tue.csb.mpserver.wrapper.io :as io]
    [edu.tue.csb.mpserver.wrapper.parameters :as parameters])
@@ -54,14 +55,16 @@
 
 
 (defn- file-extension [filename]
-  (str "." (last (str/split filename #"\."))))
-
+  (let [parts (str/split filename #"\.")]
+    (if (= 1 (count parts))
+      nil
+      (str "." (last )))))
 
 (defn- temp-file [{:keys [tempfile filename] :as req}]
   (log/debug "file parameters:" req)
   (let [ext         (file-extension filename)
         custom-path (str/replace
-                     (.getAbsolutePath tempfile) ".tmp" ext)]
+                     (.getAbsolutePath tempfile) ".tmp" (or ext ".xml"))]
     (java.io/copy (java.io/file tempfile)
                   (java.io/file custom-path))
     (java.io/file custom-path)))
@@ -72,26 +75,28 @@
   [handler]
   (fn wrapped-with-context-handler
     [{:keys [multipart-params run-id] :as req}]
-    (let [config     (some-> multipart-params
-                             (get "config"))
-          parameters (or (parameters/parameters-from-json config)
-                         parameters/default-parameters)
-          file       (-> multipart-params
-                         (get "modelFile")
-                         temp-file)
-          context    {:parameters parameters
-                      :registry   (IdentifiersOrg.)
-                      :observers  []}
-          doc        (io/read-file file parameters)]
-      (log/debug "Received config:" (prn-str config))
-      (log/debug "Running with parameters:" (prn-str parameters))
-      (let [response (-> req
-                         (assoc-in [:params :context] context)
-                         (assoc-in [:params :sbml-doc] doc)
-                         (assoc-in [:params :tempfile] file)
-                         (assoc-in [:params :config] config)
-                         (handler))]
-        (assoc-in response [:body :parameters] (str parameters))))))
+    (let [config         (some-> multipart-params (get "config"))
+          request-config (merge (json/parse-string
+                                 (slurp (java.io/resource "default-request-config.json"))
+                                 true)
+                                (json/parse-string config true))
+          mp-parameters  (or (parameters/parameters-from-json config)
+                                parameters/default-parameters)
+          file           (-> multipart-params
+                             (get "modelFile")
+                             temp-file)
+          context        {:mp-parameters mp-parameters
+                          :registry      (IdentifiersOrg.)
+                          :observers     []}
+          doc            (io/read-file file mp-parameters)]
+      (log/debug "Received effective config:" (prn-str request-config))
+      (log/debug "Running with parameters:" (prn-str mp-parameters))
+      (-> req
+          (assoc-in [:params :context] context)
+          (assoc-in [:params :sbml-doc] doc)
+          (assoc-in [:params :tempfile] file)
+          (assoc-in [:params :config] request-config)
+          (handler)))))
 
 
 (defn wrap-with-diff
@@ -115,18 +120,18 @@
 
 
 (defn wrap-with-save-file!
-  "If the parameters tell us we are allowed to save the model to disc,
+  "If the request tells us we are allowed to save the model to disc,
   save it."
   [handler]
   (fn wrapped-with-save-file-handler
-    [{:keys [params] :as req}]
+    [{:keys [params run-id] :as req}]
     (let [{:keys [config sbml-doc tempfile]} params]
       (when (:allow-model-to-be-saved-on-server config)
-        (log/debug (str "Saving model to /var/lib/models/"
-                        (.getName tempfile)))
+        (log/debug (str "Saving model to " (:save-models-path app-config) "/"
+                        run-id))
         (java.io/copy (java.io/file tempfile)
-                      (java.io/file (str "/var/lib/models/"
-                                         (.getName tempfile)))))
+                      (java.io/file (str (:save-models-path app-config) "/"
+                                         run-id))))
       (handler req))))
 
 

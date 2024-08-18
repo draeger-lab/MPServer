@@ -1,0 +1,15 @@
+{:port             3000
+ :subpath          "/modelling/api/development"
+ :save-models-path "saved-models"
+ :bigg             {:port     1310
+                    :host     "localhost"
+                    :db-name  "bigg"
+                    :user     "postgres"
+                    :password "postgres"}
+ :adb              {:port     1013
+                    :host     "localhost"
+                    :db-name  "adb"
+                    :user     "postgres"
+                    :password "postgres"}
+ :validator        {:port 8000
+                    :host "localhost"}}

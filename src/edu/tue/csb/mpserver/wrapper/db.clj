@@ -1,7 +1,8 @@
 (ns edu.tue.csb.mpserver.wrapper.db
   (:require
-   [mount.core :refer [defstate] :as mount]
-   [clojure.tools.logging :as log])
+   [mount.core :refer [defstate]]
+   [clojure.tools.logging :as log]
+   [edu.tue.csb.mpserver.config :refer [app-config]])
   (:import
    (edu.ucsd.sbrg.db.bigg BiGGDB)
    (edu.ucsd.sbrg.db.adb AnnotateDB)
@@ -18,12 +19,12 @@
 (defstate bigg-db
   :start
   (do (log/info "Initializing BiGG DB.")
-      (init-bigg-db (:bigg (mount/args)))))
+      (init-bigg-db (:bigg app-config))))
 
 (defstate adb
   :start
   (do (log/info "Initializing AnnotateDB.")
-      (init-adb-db (:adb (mount/args)))))
+      (init-adb-db (:adb app-config))))
 
 
 ;; (mount/start #'bigg-db)

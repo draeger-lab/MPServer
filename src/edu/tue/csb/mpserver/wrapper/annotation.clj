@@ -7,15 +7,15 @@
    (edu.ucsd.sbrg.parameters DBParameters)
    (org.sbml.jsbml SBMLDocument)))
 
-(defn annotate-with-bigg! [^SBMLDocument doc {:keys [parameters registry observers]}]
-  (let [bigg-params    (.. parameters (annotation) (biggAnnotationParameters))
-        sbo-params     (.. parameters (sboTerms))
+(defn annotate-with-bigg! [^SBMLDocument doc {:keys [mp-parameters registry observers]}]
+  (let [bigg-params    (.. mp-parameters (annotation) (biggAnnotationParameters))
+        sbo-params     (.. mp-parameters (sboTerms))
         bigg           (BiGGDB.)
         bigg-annotator (BiGGSBMLAnnotator. bigg bigg-params sbo-params registry observers)]
     (.annotate bigg-annotator doc)))
 
-(defn annotate-with-adb! [^SBMLDocument doc {:keys [parameters registry observers]}]
-  (let [adb-params     (.. parameters (annotation) (adbAnnotationParameters))
+(defn annotate-with-adb! [^SBMLDocument doc {:keys [mp-parameters registry observers]}]
+  (let [adb-params     (.. mp-parameters (annotation) (adbAnnotationParameters))
         adb            (AnnotateDB.)
         adb-annotator (ADBSBMLAnnotator. adb adb-params)]
     (.annotate adb-annotator doc)))

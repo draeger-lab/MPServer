@@ -22,6 +22,12 @@
                        :params params}
                       e)))))
 
+(defn write-file
+  [sbml-doc file]
+  (let [writer (ModelWriter.
+                (.. (Parameters.) (outputType)))]
+    (.write writer sbml-doc file)))
+
 
 (defn- input-stream->base64
   [input-stream]
@@ -33,7 +39,7 @@
   [context sbml-doc]
   (log/debug "Encoding model to base64.")
   (let [writer       (ModelWriter.
-                      (parameters/output-type (-> context :parameters)))
+                      (parameters/output-type (-> context :mp-parameters)))
         input-stream (.write writer sbml-doc)
         result       (input-stream->base64 input-stream)]
     (log/debug "Done encoding.")

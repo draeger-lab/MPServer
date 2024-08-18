@@ -57,6 +57,10 @@
 					},
 					"modelFile": {
 					    "$ref": "#/components/schemas/base64ModelFile"
+					},
+					"preValidation": {
+					},
+					"postValidation": {
 					}
 				    }
 				}
@@ -221,6 +225,20 @@
 	    },
 	    "diff": {
 		"title": "Summary of Differences after Polishing",
+		"type": "array",
+		"items": {
+		    "type": "object"
+		}
+	    },
+	    "preValidation": {
+		"title": "Validation Result before Polishing",
+		"type": "array",
+		"items": {
+		    "type": "object"
+		}
+	    },
+	    "postValidation": {
+		"title": "Validation Result after Polishing",
 		"type": "array",
 		"items": {
 		    "type": "object"
