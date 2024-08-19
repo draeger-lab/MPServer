@@ -9,7 +9,7 @@
 
 (defn annotate-with-bigg! [^SBMLDocument doc {:keys [mp-parameters registry observers]}]
   (let [bigg-params    (.. mp-parameters (annotation) (biggAnnotationParameters))
-        sbo-params     (.. mp-parameters (sboTerms))
+        sbo-params     (.. mp-parameters (sboParameters))
         bigg           (BiGGDB.)
         bigg-annotator (BiGGSBMLAnnotator. bigg bigg-params sbo-params registry observers)]
     (.annotate bigg-annotator doc)))

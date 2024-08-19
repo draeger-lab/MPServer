@@ -8,6 +8,6 @@
    (edu.ucsd.sbrg.fixing SBMLFixer)
    (java.io OutputStream)))
 
-(defn fix! [sbml-doc]
-  (let [fixer (SBMLFixer.)]
+(defn fix! [sbml-doc {:keys [mp-parameters]}]
+  (let [fixer (SBMLFixer. (.fixing mp-parameters))]
     (.fix fixer sbml-doc 0)))

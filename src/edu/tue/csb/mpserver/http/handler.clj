@@ -12,24 +12,24 @@
   (let [{:keys [context sbml-doc]} params
         pre-validation-results     (validate/validate (:tempfile params))
         mp-parameters              (-> context :mp-parameters)]
-    (log/debug "Validation results:" pre-validation-results)
     (do
       
       (when (and (not (parameters/dont-fix? mp-parameters))
                  (not-empty (:validation pre-validation-results)))
-        (fixing/fix! sbml-doc))
+        (fixing/fix! sbml-doc context))
 
-      (when (or (empty? (:validation pre-validation-results))
-                (parameters/polish-even-if-model-invalid? mp-parameters))
-        (polishing/polish! sbml-doc context))
+      (let [polish? (or (empty? (:validation pre-validation-results))
+                            (parameters/polish-even-if-model-invalid? mp-parameters))]
+        (when polish?
+          (polishing/polish! sbml-doc context)
 
-      (when (parameters/annotate-with-bigg? mp-parameters)
-        (log/debug "Annotating with BiGG")
-        (annotation/annotate-with-bigg! sbml-doc context))
+          (when (parameters/annotate-with-bigg? mp-parameters)
+            (log/debug "Annotating with BiGG")
+            (annotation/annotate-with-bigg! sbml-doc context))
 
-      (when (parameters/annotate-with-adb? mp-parameters)
-        (log/debug "Annotating with ADB")
-        (annotation/annotate-with-adb! sbml-doc context))
+          (when (parameters/annotate-with-adb? mp-parameters)
+            (log/debug "Annotating with ADB")
+            (annotation/annotate-with-adb! sbml-doc context))))
 
       (let [base64-model (io/sbml-doc->base64 context sbml-doc)
             tmp          (java.io.File/createTempFile "postpolish-" ".xml")]

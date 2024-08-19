@@ -14,7 +14,7 @@
   [input ^Parameters params]
   (try
     (let [registry (IdentifiersOrg.)]
-      (.read (ModelReader. (.sboTerms params) registry) input))
+      (.read (ModelReader. (.sboParameters params) registry) input))
     (catch Exception e
       (throw (ex-info "Reading file failed"
                       {:type   :parse/file

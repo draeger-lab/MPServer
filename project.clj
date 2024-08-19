@@ -16,12 +16,13 @@
                  ;; state management library
                  [mount "0.1.18"]
                  [org.clojure/tools.logging "1.3.0"]
-                 [ch.qos.logback/logback-classic "1.2.3"]
+                 [ch.qos.logback/logback-classic "1.5.7"
+                  :exclusions [org.slf4j/slf4j-api]]
                  [cheshire "5.13.0"]
                  [clj-http "3.13.0"]
                  [org.clojure/tools.cli "1.1.230"]
                  
-                 [edu.ucsd.sbrg.ModelPolisher "2.1.8"]
+                 [edu.ucsd.sbrg.ModelPolisher "2.1.10"]
 
                  ;; dev time
                  [ring/ring-devel "1.12.2"]]

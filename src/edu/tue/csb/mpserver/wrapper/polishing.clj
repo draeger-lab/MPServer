@@ -8,7 +8,7 @@
 
 (defn polish! [^SBMLDocument doc {:keys [mp-parameters registry observers]}]
   (let [polisher (SBMLPolisher. (.polishing mp-parameters)
-                                (.sboTerms mp-parameters)
+                                (.sboParameters mp-parameters)
                                 registry
                                 observers)]
     (.polish polisher doc)))

@@ -1,5 +1,6 @@
 {
     "allow-model-to-be-saved-on-server": true,
+    "produce-diff": true,
     "sbo-terms": {
 	"add-generic-terms": true
     },

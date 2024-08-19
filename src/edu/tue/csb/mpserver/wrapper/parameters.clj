@@ -48,4 +48,4 @@
   (.. params (fixing) (dontFix)))
 
 (defn polish-even-if-model-invalid? [^Parameters params]
-  (.. params (fixing) (polishEvenIfModelInvalid)))
+  (.. params (polishing) (polishEvenIfModelInvalid)))

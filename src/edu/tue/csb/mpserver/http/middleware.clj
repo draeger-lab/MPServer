@@ -106,17 +106,21 @@
   [handler]
   (fn wrapped-with-diff-handler
     [{:keys [params] :as req}]
-    (let [{:keys [sbml-doc]} params
+    (let [{:keys [config sbml-doc]} params
           old-doc            (.clone sbml-doc)
-          resp               (handler req)]
-      (log/debug "Calculating diff.")
-      (try
-        (let [diff  (diff/diff old-doc sbml-doc)]
-          (log/debug "Done calculating diff.")
-          (assoc-in resp [:body :diff] diff))
-        (catch Throwable t
-          (log/error t "Failed diff.")
-          (assoc-in resp [:body :diff] {:message "Sorry, calculating the diff failed for some reason."}))))))
+          resp               (handler req)
+          produce-diff?      (:produce-diff config)]
+      (if produce-diff?
+        (do
+          (log/debug "Calculating diff.")
+          (try
+            (let [diff (diff/diff old-doc sbml-doc)]
+              (log/debug "Done calculating diff.")
+              (assoc-in resp [:body :diff] diff))
+            (catch Throwable t
+              (log/error t "Failed diff.")
+              (assoc-in resp [:body :diff] {:message "Sorry, calculating the diff failed for some reason."}))))
+        resp))))
 
 
 (defn wrap-with-save-file!
