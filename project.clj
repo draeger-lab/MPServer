@@ -1,4 +1,4 @@
-(defproject model-polisher-server "1.0.0-SNAPSHOT"
+(defproject model-polisher-server "0.9.0"
   :main edu.tue.csb.mpserver.core
   :profiles {:uberjar {:aot :all}}
   :plugins [[refactor-nrepl "3.10.0"]
@@ -22,7 +22,7 @@
                  [clj-http "3.13.0"]
                  [org.clojure/tools.cli "1.1.230"]
                  
-                 [edu.ucsd.sbrg.ModelPolisher "2.1.10"]
+                 [edu.ucsd.sbrg/ModelPolisher "2.1-pre-release"]
 
                  ;; dev time
                  [ring/ring-devel "1.12.2"]]
