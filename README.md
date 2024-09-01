@@ -3,17 +3,17 @@ Server Implementation for the [ModelPolisher 2.1](https://github.com/draeger-lab
 
 The corresponding Python client library stub can be found [here](https://github.com/draeger-lab/MPClient). Information on how to generate it is [here](#python-client).
 
-See the [Releases Page](https://github.com/draeger-lab/MPServer/releases/tag/pre-release) for a download of the standalone JAR.
+See the [Releases Page](https://github.com/draeger-lab/MPServer/releases) for a download of the standalone JAR.
 You can run it with 
 ``` bash
-java -jar model-polisher-server-1.0.0-SNAPSHOT-standalone.jar
+java -jar model-polisher-server-0.9.0-standalone.jar --config-file path/to/server-config.edn
 ```
+The [`server-config.edn`](resources/server-config.edn) determines server behaviour and where to find systems the server depends on.
 
-A [`config.json`](resources/default-request-config.json) can be used to determine behaviour.
+A [`config.json`](resources/default-request-config.json) can be used to determine default behaviour for all options that the client does not provide values for.
 
 **Note**: 
-- Using BiGGDB will not work without a running BiGGDB instance. Right now the the DB-Config is hardcoded to use hostname `bigg`, which likely means that *for now you should not bother trying to use this*
-- I run Java 21 locally; the project is likely compiled against it and you won't be able to run it with an older version right now
+- Currently, it is intended for this project to run on Java 17. However, this is untested. It is known to run on Java 21.
 
 ## Example Usage
 
