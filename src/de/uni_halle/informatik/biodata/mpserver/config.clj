@@ -1,4 +1,4 @@
-(ns edu.tue.csb.mpserver.config
+(ns de.uni-halle.informatik.biodata.mpserver.config
   (:require
    [clojure.edn :as edn]
    [clojure.java.io :as java.io]

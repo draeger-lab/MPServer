@@ -1,15 +1,15 @@
-(ns edu.tue.csb.mpserver.http.middleware
+(ns de.uni-halle.informatik.biodata.mpserver.http.middleware
   (:require
    [cheshire.core :as json]
    [clojure.java.io :as java.io]
    [clojure.string :as str]
    [clojure.tools.logging :as log]
-   [edu.tue.csb.mpserver.config :refer [app-config]]
-   [edu.tue.csb.mpserver.diff :as diff]
-   [edu.tue.csb.mpserver.wrapper.io :as io]
-   [edu.tue.csb.mpserver.wrapper.parameters :as parameters])
+   [de.uni-halle.informatik.biodata.mpserver.config :refer [app-config]]
+   [de.uni-halle.informatik.biodata.mpserver.diff :as diff]
+   [de.uni-halle.informatik.biodata.mpserver.wrapper.io :as io]
+   [de.uni-halle.informatik.biodata.mpserver.wrapper.parameters :as parameters])
   (:import
-   (edu.ucsd.sbrg.resolver.identifiersorg IdentifiersOrg)
+   (de.uni_halle.informatik.biodata.mp.resolver.identifiersorg IdentifiersOrg)
    (org.slf4j MDC)))
 
 

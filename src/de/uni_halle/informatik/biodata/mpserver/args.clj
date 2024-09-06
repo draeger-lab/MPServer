@@ -1,4 +1,4 @@
-(ns edu.tue.csb.mpserver.args
+(ns de.uni-halle.informatik.biodata.mpserver.args
   (:require
    [clojure.edn :as edn]
    [clojure.string :as str]

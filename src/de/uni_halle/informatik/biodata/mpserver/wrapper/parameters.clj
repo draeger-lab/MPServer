@@ -1,9 +1,9 @@
-(ns edu.tue.csb.mpserver.wrapper.parameters
+(ns de.uni-halle.informatik.biodata.mpserver.wrapper.parameters
   (:require
    [cheshire.core :as json]
    [clojure.java.io :as io])
   (:import
-   (edu.ucsd.sbrg.parameters Parameters ParametersParser)))
+   (de.uni_halle.informatik.biodata.mp.parameters Parameters ParametersParser)))
 
 
 (def default-parameters

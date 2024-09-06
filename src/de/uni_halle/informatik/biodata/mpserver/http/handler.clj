@@ -1,12 +1,12 @@
-(ns edu.tue.csb.mpserver.http.handler
+(ns de.uni-halle.informatik.biodata.mpserver.http.handler
   (:require
    [clojure.tools.logging :as log]
-   [edu.tue.csb.mpserver.wrapper.annotation :as annotation]
-   [edu.tue.csb.mpserver.wrapper.fixing :as fixing]
-   [edu.tue.csb.mpserver.validate :as validate]
-   [edu.tue.csb.mpserver.wrapper.io :as io]
-   [edu.tue.csb.mpserver.wrapper.parameters :as parameters]
-   [edu.tue.csb.mpserver.wrapper.polishing :as polishing]))
+   [de.uni-halle.informatik.biodata.mpserver.wrapper.annotation :as annotation]
+   [de.uni-halle.informatik.biodata.mpserver.wrapper.fixing :as fixing]
+   [de.uni-halle.informatik.biodata.mpserver.validate :as validate]
+   [de.uni-halle.informatik.biodata.mpserver.wrapper.io :as io]
+   [de.uni-halle.informatik.biodata.mpserver.wrapper.parameters :as parameters]
+   [de.uni-halle.informatik.biodata.mpserver.wrapper.polishing :as polishing]))
 
 (defn submit-handler [{:keys [params run-id] :as req}]
   (let [{:keys [context sbml-doc]} params

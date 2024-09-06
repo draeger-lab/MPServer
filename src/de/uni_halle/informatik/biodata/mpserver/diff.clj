@@ -1,10 +1,10 @@
-(ns edu.tue.csb.mpserver.diff
+(ns de.uni-halle.informatik.biodata.mpserver.diff
   (:require
    [clojure.data]
    [clojure.java.io :as java.io]
    [clojure.tools.logging :as log]
-   [edu.tue.csb.mpserver.wrapper.io :as io]
-   [edu.tue.csb.mpserver.wrapper.parameters :as parameters])
+   [de.uni-halle.informatik.biodata.mpserver.wrapper.io :as io]
+   [de.uni-halle.informatik.biodata.mpserver.wrapper.parameters :as parameters])
   (:import
    (java.lang.reflect Method)
    (org.sbml.jsbml SBMLDocument)))

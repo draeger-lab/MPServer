@@ -1,13 +1,13 @@
-(ns edu.tue.csb.mpserver.validate
+(ns de.uni-halle.informatik.biodata.mpserver.validate
   (:require
    [cheshire.core :as json]
    [clj-http.client :as client]
    [clojure.data]
    [clojure.java.io :as java.io]
    [clojure.tools.logging :as log]
-   [edu.tue.csb.mpserver.config :refer [app-config]]
-   [edu.tue.csb.mpserver.wrapper.io :as io]
-   [edu.tue.csb.mpserver.wrapper.parameters :as parameters]
+   [de.uni-halle.informatik.biodata.mpserver.config :refer [app-config]]
+   [de.uni-halle.informatik.biodata.mpserver.wrapper.io :as io]
+   [de.uni-halle.informatik.biodata.mpserver.wrapper.parameters :as parameters]
    [mount.core :as mount :refer [defstate]])
   (:import
    (java.lang.reflect Method)

@@ -1,10 +1,10 @@
-(ns edu.tue.csb.mpserver.wrapper.annotation
+(ns de.uni-halle.informatik.biodata.mpserver.wrapper.annotation
   (:import
-   (edu.ucsd.sbrg.annotation.adb ADBSBMLAnnotator)
-   (edu.ucsd.sbrg.annotation.bigg BiGGSBMLAnnotator)
-   (edu.ucsd.sbrg.db.adb AnnotateDB)
-   (edu.ucsd.sbrg.db.bigg BiGGDB)
-   (edu.ucsd.sbrg.parameters DBParameters)
+   (de.uni_halle.informatik.biodata.mp.annotation.adb ADBSBMLAnnotator)
+   (de.uni_halle.informatik.biodata.mp.annotation.bigg BiGGSBMLAnnotator)
+   (de.uni_halle.informatik.biodata.mp.db.adb AnnotateDB)
+   (de.uni_halle.informatik.biodata.mp.db.bigg BiGGDB)
+   (de.uni_halle.informatik.biodata.mp.parameters DBParameters)
    (org.sbml.jsbml SBMLDocument)))
 
 (defn annotate-with-bigg! [^SBMLDocument doc {:keys [mp-parameters registry observers]}]

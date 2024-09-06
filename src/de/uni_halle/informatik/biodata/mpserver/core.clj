@@ -1,12 +1,12 @@
-(ns edu.tue.csb.mpserver.core
+(ns de.uni-halle.informatik.biodata.mpserver.core
   (:gen-class)
   (:require
    [clojure.edn :as edn]
    [clojure.java.io :as io]
-   [edu.tue.csb.mpserver.args :as args]
-   [edu.tue.csb.mpserver.http.server]
-   [edu.tue.csb.mpserver.wrapper.db]
-   [edu.tue.csb.mpserver.validate]
+   [de.uni-halle.informatik.biodata.mpserver.args :as args]
+   [de.uni-halle.informatik.biodata.mpserver.http.server]
+   [de.uni-halle.informatik.biodata.mpserver.wrapper.db]
+   [de.uni-halle.informatik.biodata.mpserver.validate]
    [mount.core :as mount]
    [clojure.tools.logging :as log]))
 

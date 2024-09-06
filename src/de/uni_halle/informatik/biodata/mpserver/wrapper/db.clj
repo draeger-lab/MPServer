@@ -1,12 +1,12 @@
-(ns edu.tue.csb.mpserver.wrapper.db
+(ns de.uni-halle.informatik.biodata.mpserver.wrapper.db
   (:require
    [mount.core :refer [defstate]]
    [clojure.tools.logging :as log]
-   [edu.tue.csb.mpserver.config :refer [app-config]])
+   [de.uni-halle.informatik.biodata.mpserver.config :refer [app-config]])
   (:import
-   (edu.ucsd.sbrg.db.bigg BiGGDB)
-   (edu.ucsd.sbrg.db.adb AnnotateDB)
-   (edu.ucsd.sbrg.parameters DBParameters)))
+   (de.uni_halle.informatik.biodata.mp.db.bigg BiGGDB)
+   (de.uni_halle.informatik.biodata.mp.db.adb AnnotateDB)
+   (de.uni_halle.informatik.biodata.mp.parameters DBParameters)))
 
 (defn init-bigg-db [{:keys [db-name host user port password]}]
   (BiGGDB/init (DBParameters. db-name host user (int port) password)))

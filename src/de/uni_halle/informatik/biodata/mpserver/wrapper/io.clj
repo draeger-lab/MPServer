@@ -1,11 +1,11 @@
-(ns edu.tue.csb.mpserver.wrapper.io
+(ns de.uni-halle.informatik.biodata.mpserver.wrapper.io
   (:require
    [clojure.tools.logging :as log]
-   [edu.tue.csb.mpserver.wrapper.parameters :as parameters])
+   [de.uni-halle.informatik.biodata.mpserver.wrapper.parameters :as parameters])
   (:import
-   (edu.ucsd.sbrg.io ModelReader ModelWriter)
-   (edu.ucsd.sbrg.parameters Parameters)
-   (edu.ucsd.sbrg.resolver.identifiersorg IdentifiersOrg)
+   (de.uni_halle.informatik.biodata.mp.io ModelReader ModelWriter)
+   (de.uni_halle.informatik.biodata.mp.parameters Parameters)
+   (de.uni_halle.informatik.biodata.mp.resolver.identifiersorg IdentifiersOrg)
    (org.apache.commons.io IOUtils)
    (java.util Base64)))
 

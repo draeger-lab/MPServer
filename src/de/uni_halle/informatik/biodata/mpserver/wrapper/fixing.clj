@@ -1,11 +1,11 @@
-(ns edu.tue.csb.mpserver.wrapper.fixing
+(ns de.uni-halle.informatik.biodata.mpserver.wrapper.fixing
   (:require
    [clojure.java.io :as java.io]
    [clojure.string :as str]
    [clojure.tools.logging :as log]
-   [edu.tue.csb.mpserver.wrapper.io :as io])
+   [de.uni-halle.informatik.biodata.mpserver.wrapper.io :as io])
   (:import
-   (edu.ucsd.sbrg.fixing SBMLFixer)
+   (de.uni_halle.informatik.biodata.mp.fixing SBMLFixer)
    (java.io OutputStream)))
 
 (defn fix! [sbml-doc {:keys [mp-parameters]}]

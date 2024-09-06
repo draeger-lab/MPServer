@@ -1,6 +1,6 @@
-(ns edu.tue.csb.mpserver.wrapper.polishing
+(ns de.uni-halle.informatik.biodata.mpserver.wrapper.polishing
   (:import
-   (edu.ucsd.sbrg.polishing SBMLPolisher)
+   (de.uni_halle.informatik.biodata.mp.polishing SBMLPolisher)
    (org.sbml.jsbml SBMLDocument)))
 
 (def model-polisher-version

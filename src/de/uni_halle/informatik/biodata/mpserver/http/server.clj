@@ -1,9 +1,9 @@
-(ns edu.tue.csb.mpserver.http.server
+(ns de.uni-halle.informatik.biodata.mpserver.http.server
   (:require
    [clojure.java.io :as io]
-   [edu.tue.csb.mpserver.http.handler :as handler]
-   [edu.tue.csb.mpserver.http.middleware :as middleware]
-   [edu.tue.csb.mpserver.wrapper.polishing :as polishing]
+   [de.uni-halle.informatik.biodata.mpserver.http.handler :as handler]
+   [de.uni-halle.informatik.biodata.mpserver.http.middleware :as middleware]
+   [de.uni-halle.informatik.biodata.mpserver.wrapper.polishing :as polishing]
    [mount.core :refer [defstate] :as mount]
    [reitit.ring :as ring]
    [reitit.swagger-ui :as swagger-ui]
@@ -13,7 +13,7 @@
    [ring.middleware.multipart-params :refer [wrap-multipart-params]]
    [ring.middleware.params :refer [wrap-params]]
    [ring.util.response :as response]
-   [edu.tue.csb.mpserver.config :refer [app-config]]))
+   [de.uni-halle.informatik.biodata.mpserver.config :refer [app-config]]))
 
 (def app
   (ring/ring-handler
