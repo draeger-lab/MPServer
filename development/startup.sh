@@ -20,7 +20,9 @@ echo "Bulding Model Polisher"
 ./gradlew jar -x test >/dev/null 2>&1
 
 echo "Installing Jar in local Maven repo"
-lein localrepo install target/ModelPolisher-2.1.jar -p build/publications/maven/pom-default.xml de.uni_halle.informatik.biodata.mp.ModelPolisher 2.1 >/dev/null 2>&1
+lein localrepo install target/ModelPolisher-2.1.jar \
+     -p lib/build/publications/modelPolisherLibrary/pom-default.xml \
+     de.uni-halle.informatik.biodata.mp.ModelPolisher DEV >/dev/null 2>&1
 
 cd /opt
 
@@ -29,7 +31,7 @@ git clone https://github.com/draeger-lab/MPServer.git >/dev/null 2>&1 \
     && cd /opt/MPServer \
     && git pull >/dev/null 2>&1
 
-sed -i 's/\(de.uni_halle.informatik.biodata.mp.ModelPolisher "\)[^"]*\(".*\)/\12.1\2/' project.clj
+sed -i 's/\(de.uni-halle.informatik.biodata.mp.ModelPolisher "\)[^"]*\(".*\)/\1DEV\2/' project.clj
 
 echo "Checked out revision: $(git rev-parse HEAD)"
 
@@ -39,6 +41,6 @@ lein uberjar >/dev/null 2>&1
 cd /opt
 
 echo "Starting Server"
-exec java -jar MPServer/target/model-polisher-server-1.0.0-SNAPSHOT-standalone.jar "$@"
+exec java -jar MPServer/target/model-polisher-server-0.9.0-standalone.jar "$@"
 
 
