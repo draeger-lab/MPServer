@@ -15,7 +15,8 @@
    [ring.util.response :as response]
    [de.uni-halle.informatik.biodata.mpserver.config :refer [app-config]]))
 
-(def app
+(defn app
+  [subpath]
   (ring/ring-handler
    (ring/router
     [""
@@ -34,7 +35,7 @@
      ;; ... which is used by the swagger UI (unfortunately with full path at the moment)
      ["/docs/*" {:no-doc true
                  :get    (swagger-ui/create-swagger-ui-handler
-                          {:url (str (:subpath app-config) "/openapi.json")})}]]
+                          {:url (str subpath "/openapi.json")})}]]
     {:data     {:middleware [middleware/wrap-mdc!
                              middleware/wrap-exception
                              wrap-params
@@ -56,7 +57,7 @@
 ;; which serves to start up system components/objects on startup
 (defstate http-server
   :start (let [{:keys [port subpath]} app-config]
-           (-> app
+           (-> (app subpath)
                (run-jetty {:port (int port)
                            ;; otherwise this would be blocking
                            :join? false
