@@ -113,31 +113,40 @@
     [(merge (zipmap all-keys (repeat nil)) m1)
      (merge (zipmap all-keys (repeat nil)) m2)]))
 
-(defn new-diff [accessor old-doc new-doc]
-  (let [[c1 c2] (ensure-same-keys
+(defn new-diff* [c1 c2]
+  (->> (clojure.data/diff c1 c2)
+       (take 2)
+       (apply
+        clojure.data/diff)
+       (take 2)
+       (apply (partial merge-with vector))
+       (map (fn [[k [v1 v2]]]
+              (if-not (or (nil? v1)
+                          (nil? v2))
+                (let [[c1 c2] (ensure-same-keys v1 v2)
+                      vs (->> (merge-with vector c1 c2)
+                              (filter (fn [[k [v1 v2]]] (not (both-nan? v1 v2))))
+                              (into {}))]
+                  (when (not-empty vs)
+                    [k vs]))
+                [k [v1 v2]])))
+       (filter some?)
+       (into {})))
+
+(defn mappify-elements
+  [accessor old-doc new-doc]
+  (ensure-same-keys
                  (zipmap
                   (map id (accessor old-doc))
                   (map beanify (accessor old-doc)))
                  (zipmap
                   (map id (accessor new-doc))
-                  (map beanify (accessor new-doc))))]
-       (->> (clojure.data/diff c1 c2)
-            (take 2)
-            (apply
-             clojure.data/diff)
-            (apply (partial merge-with vector))
-            (map (fn [[k [v1 v2]]]
-                   (if-not (or (nil? v1)
-                               (nil? v2))
-                     (let [[c1 c2] (ensure-same-keys v1 v2)
-                           vs (->> (merge-with vector c1 c2)
-                                   (filter (fn [[k [v1 v2]]] (not (both-nan? v1 v2))))
-                                   (into {}))]
-                       (when (not-empty vs)
-                         [k vs]))
-                     [k [v1 v2]])))
-            (filter some?)
-            (into {}))))
+                  (map beanify (accessor new-doc)))))
+
+(defn new-diff
+  [accessor old-doc new-doc]
+  (let [[c1 c2] (mappify-elements accessor old-doc new-doc)]
+    (new-diff* c1 c2)))
 
 (defn diff [^SBMLDocument old-doc ^SBMLDocument new-doc]
   (log/debug "Diff!")
