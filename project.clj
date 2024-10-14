@@ -1,4 +1,4 @@
-(defproject model-polisher-server "0.9.0"
+(defproject model-polisher-server "2.1.0"
   :main de.uni-halle.informatik.biodata.mpserver.core
   :profiles {:uberjar {:aot :all}}
   :plugins [[refactor-nrepl "3.10.0"]

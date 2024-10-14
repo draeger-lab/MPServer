@@ -6,7 +6,7 @@ The corresponding Python client library stub can be found [here](https://github.
 See the [Releases Page](https://github.com/draeger-lab/MPServer/releases) for a download of the standalone JAR.
 You can run it with 
 ``` bash
-java -jar model-polisher-server-0.9.0-standalone.jar --config-file path/to/server-config.edn
+java -jar model-polisher-server-2.1.0-standalone.jar --config-file path/to/server-config.edn
 ```
 The [`server-config.edn`](resources/server-config.edn) determines server behaviour and where to find systems the server depends on.
 

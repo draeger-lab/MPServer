@@ -7,8 +7,7 @@
     },
     "servers": [
 	{
-	    "url": "https://biodata.informatik.uni-halle.de/modelling/api/development/",
-	    "description": "Development"
+	    "url": "https://biodata.informatik.uni-halle.de/modelling/api/v2.1/"
 	}
     ],
     "paths": {

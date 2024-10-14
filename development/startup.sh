@@ -41,6 +41,6 @@ lein uberjar >/dev/null 2>&1
 cd /opt
 
 echo "Starting Server"
-exec java -jar MPServer/target/model-polisher-server-0.9.0-standalone.jar "$@"
+exec java -jar MPServer/target/model-polisher-server-2.1.0-standalone.jar "$@"
 
 
