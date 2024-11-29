@@ -38,5 +38,5 @@
           {:status 200
            :body   {:runId          run-id
                     :modelFile      base64-model
-                    :preValidation  (:validation pre-validation-results)
-                    :postValidation (:validation post-validation-results)}})))))
+                    :preValidation  pre-validation-results
+                    :postValidation post-validation-results}})))))
